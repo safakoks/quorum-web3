@@ -1,0 +1,25 @@
+{
+  "name": "quorum-web3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "quorum-js": "^0.3.4",
+    "solc": "^0.6.1",
+    "web3": "^1.2.5-rc.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/safakoks/quorum-web3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/safakoks/quorum-web3/issues"
+  },
+  "homepage": "https://github.com/safakoks/quorum-web3#readme"
+}
