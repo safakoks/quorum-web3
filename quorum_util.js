@@ -45,11 +45,11 @@ function createAccount(){
 }
 
 function checkConnection(){
-    web3.eth.net.isListening()
-    .then(() => console.log('Connected \n'))
+    return web3.eth.net.isListening()
+    .then(() => {
+        return true } )
     .catch(error => {
-         console.log(`Wow. Something went wrong ${error} \n`);
-         process.exit();
+         console.log(`\n Connection Error : ${error} \n`);
         });
 }
 
@@ -158,13 +158,15 @@ function loadAllAddress(){
     })
 }
 
-function init(){
+async function init(){
+    
+    await web3.setProvider(
+        new Web3.providers.WebsocketProvider(
+            `ws://${host}:${port}`
+            ));
+
     extendWeb3();
     loadAllAddress();
-    web3.setProvider(
-        new Web3.providers.WebsocketProvider(
-            'ws://0.0.0.0:8546'
-            ));
 }
 
 

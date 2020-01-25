@@ -30,6 +30,39 @@ function checkGlobalVariables(){
     }
 }
 
+function connectionScreen(){
+
+    return new Promise((resolve, reject)=>{
+        try {
+            var host, port;
+            terminal.green("\n Connection Settings \n");
+            terminal('Please enter host address: ' ) ;
+            terminal.inputField({
+                default:"localhost",
+            }, (error,input)=>{
+                checkError(error);
+                host = input;
+                terminal('\nPlease enter ws port: ' ) ;
+                terminal.inputField({
+                    default:"8546",
+                },async (error,input)=>{
+                    checkError(error);
+                    port = input;
+                    quorum_util.init(host, port);
+                    if(await quorum_util.checkConnection()){
+                        terminal.green(`\n${host}:${port} connected\n`)
+                        resolve();
+                    }else{
+                        connectionScreen();
+                    }
+                })
+            })
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
 function createAccountScreen(){
     var account =  quorum_util.createAccount();
     return new Promise( resolve => { resolve(account)})
@@ -67,8 +100,6 @@ async function listContractsScreen(){
         })
 }
 
-
-
 async function deployContractScreen(){
     await quorum_util.file_util.getContracts().then(contracts => {
         return new Promise((resolve, reject)=>{
@@ -86,10 +117,11 @@ async function deployContractScreen(){
     });
 }
 
-quorum_util.init();
-
 async function MainScreen() {
-    terminal.grey("Welcome Quorum Web3 Terminal \n");
+    if (!await quorum_util.checkConnection()){
+        await connectionScreen()
+    }
+    terminal.grey("\n Welcome Quorum Web3 Terminal \n");
     checkGlobalVariables()
     var result = await MenuScreen().catch(error =>{
         console.log(error);
@@ -137,6 +169,5 @@ function MenuScreen() {
         }
     })
 }
-
 
 module.exports.MainScreen = MainScreen
