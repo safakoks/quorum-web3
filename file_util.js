@@ -23,10 +23,15 @@ function readFiles(current_path, callback){
         try {
             fs.readdir(current_path, (err, files) => {
                 // Dosyalar
+                if(err){
+                    throw new Error(err)
+                }
                 files.map((file) => {
+                    if(file){
                     var current_file = JSON.parse(
                         fs.readFileSync(path.join(current_path, file)));
                     returnedFiles.push(current_file);
+                }
                 });
                 resolve(returnedFiles);
               }); 

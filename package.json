@@ -6,6 +6,7 @@
   "dependencies": {
     "quorum-js": "^0.3.4",
     "solc": "^0.6.1",
+    "terminal-kit": "^1.32.3",
     "web3": "^1.2.5-rc.0"
   },
   "devDependencies": {},
@@ -21,5 +22,6 @@
   "bugs": {
     "url": "https://github.com/safakoks/quorum-web3/issues"
   },
-  "homepage": "https://github.com/safakoks/quorum-web3#readme"
+  "homepage": "https://github.com/safakoks/quorum-web3#readme",
+  "keywords": []
 }

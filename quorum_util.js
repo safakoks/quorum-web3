@@ -3,6 +3,7 @@ const quorumjs = require('quorum-js')
 const compile_util = require("./compile.js")
 const file_util = require("./file_util.js")
 var numberToBN = require("number-to-bn");
+var term = require( 'terminal-kit' ).terminal
 
 
 const contractInteraction = require("./contract_interaction.js");
@@ -34,10 +35,16 @@ function extendWeb3(){
 
 // export funcs
 function createAccount(){
-    var account = web3.eth.accounts.create();
-    web3.eth.accounts.wallet.add(account);
-    file_util.createAccountFile(account);
+    try {
+        var account = web3.eth.accounts.create();
+        web3.eth.accounts.wallet.add(account);
+        file_util.createAccountFile(account); 
+        term.green("New Account Created",account.address,"\n")
+    } catch (error) {
+        console.error(error)
+    }
 }
+
 function checkConnection(){
     web3.eth.net.isListening()
     .then(() => console.log('is connected'))
@@ -97,7 +104,7 @@ function getABI(contractAddress){
             try {
                 if (abi_files.length != 0 ){
                     abi_files.forEach((abi_file)=>{
-                        if(abi_file.address = contractAddress){
+                        if( abi_file && abi_file.address == contractAddress){
                             resolve(abi_file.abi)
                         }
                     });
@@ -107,6 +114,8 @@ function getABI(contractAddress){
             } catch (error) {
                 reject(error);
             }
+        }).catch( err => {
+            reject(err);
         });
     });
 }
@@ -150,12 +159,16 @@ function loadAllAddress(){
 function init(){
     extendWeb3();
     loadAllAddress();
-    web3.setProvider(new Web3.providers.WebsocketProvider('ws://localhost:8546'));
+    web3.setProvider(
+        new Web3.providers.WebsocketProvider(
+            'ws://0.0.0.0:23000'
+            ));
 }
 
 
 module.exports.init = init;
 module.exports.web3 = web3;
+module.exports.terminal = term;
 
 
 module.exports.contractInteraction = contractInteraction;
