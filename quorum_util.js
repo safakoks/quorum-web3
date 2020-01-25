@@ -3,7 +3,6 @@ const quorumjs = require('quorum-js')
 const compile_util = require("./compile.js")
 const file_util = require("./file_util.js")
 var numberToBN = require("number-to-bn");
-var term = require( 'terminal-kit' ).terminal
 
 
 const contractInteraction = require("./contract_interaction.js");
@@ -39,7 +38,7 @@ function createAccount(){
         var account = web3.eth.accounts.create();
         web3.eth.accounts.wallet.add(account);
         file_util.createAccountFile(account); 
-        term.green("New Account Created",account.address,"\n")
+        return account;
     } catch (error) {
         console.error(error)
     }
@@ -47,8 +46,11 @@ function createAccount(){
 
 function checkConnection(){
     web3.eth.net.isListening()
-    .then(() => console.log('is connected'))
-    .catch(e => console.log('Wow. Something went wrong'));
+    .then(() => console.log('Connected \n'))
+    .catch(error => {
+         console.log(`Wow. Something went wrong ${error} \n`);
+         process.exit();
+        });
 }
 
 function createContract(abi){
@@ -75,7 +77,7 @@ function deployContract(contract, compiledContract, account){
         console.log("Transaction", transaction)
     })
     .on('confirmation',(_, receipt)=>{
-        console.log("Confirmed")
+        console.log(`Successful`)
         file_util.createAbiFile(receipt.contractAddress, compiledContract.abi);
     })
     .on('error', function (error) {
@@ -161,15 +163,14 @@ function init(){
     loadAllAddress();
     web3.setProvider(
         new Web3.providers.WebsocketProvider(
-            'ws://0.0.0.0:23000'
+            'ws://0.0.0.0:8546'
             ));
 }
 
 
 module.exports.init = init;
 module.exports.web3 = web3;
-module.exports.terminal = term;
-
+module.exports.file_util = file_util;
 
 module.exports.contractInteraction = contractInteraction;
 module.exports.directDeployContract = directDeployContract;

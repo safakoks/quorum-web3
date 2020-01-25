@@ -41,6 +41,18 @@ function readFiles(current_path, callback){
     })
 }
 
+function getContracts(){
+    return new Promise((resolve,reject)=>{
+        try {
+            var contractsFiles = fs.readdirSync(path.join(__dirname, "contracts", "solidity"));
+            resolve(contractsFiles);
+        } catch (error) {
+            reject(error); 
+        }
+    })
+}
+
+
 async function getFileAccounts(){
     return await readFiles(path.join(__dirname,"accounts"))
 }
@@ -50,7 +62,7 @@ async function getFileAbis(callback){
 }
 
 function readContract(contractName){
-    var contractPath = path.resolve(__dirname, 'contracts', contractName);
+    var contractPath = path.resolve(__dirname, 'contracts',"solidity", contractName);
     var source = fs.readFileSync(contractPath, 'utf8');
     return source;
 }
@@ -60,4 +72,4 @@ module.exports.createAbiFile = createAbiFile;
 module.exports.getFileAccounts = getFileAccounts;
 module.exports.getFileAbis = getFileAbis;
 module.exports.readContract = readContract;
-
+module.exports.getContracts = getContracts;
