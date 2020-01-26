@@ -62,22 +62,26 @@ function compileContract(contractName){
     return { bytecode : '0x'+ compiledContract.bytecode, abi : JSON.parse(compiledContract.interface) }
 }
 
-function deployContract(contract, compiledContract, account){
+function deployContract(contract, compiledContract, account, key){
     var current_address = account ? account : getAccountByIndex(0).address;
     
     contract.deploy({
         data : compiledContract.bytecode
-    }).send({
+    }).send(key?{
         from: current_address,
-        gas: 80000000
-    }, (err, deployedContract) => {
-        console.log("Contract Address", deployedContract);
+        gas: 80000000,
+        privateFor : [key]
+    }:{
+        from: current_address,
+        gas: 80000000,
+    }
+    , (err, deployedContract) => {
+        file_util.addLogFile("Contract Address" ,deployedContract);
     })
     .on('transactionHash', (transaction) => {
-        console.log("Transaction", transaction)
+        file_util.addLogFile("Transaction",transaction);
     })
     .on('confirmation',(_, receipt)=>{
-        console.log(`Successful`)
         file_util.createAbiFile(receipt.contractAddress, compiledContract.abi);
     })
     .on('error', function (error) {
@@ -122,6 +126,16 @@ function getABI(contractAddress){
     });
 }
 
+function getTransaction(transactionHash){
+   return new Promise(
+       (resolve, reject) => { 
+           web3.eth.getTransaction(transactionHash, (error, transaction)=>{
+               if(error){
+                   reject(error);
+               }
+               resolve(transaction)
+    }) });
+}
 
 function getAccounts(){
     return file_util.getFileAccounts((accounts)=>{
@@ -138,10 +152,10 @@ async function getAbis(){
    return file_util.getFileAbis();
 }
 
-function directDeployContract(contractName, account){
+function directDeployContract(contractName, account, key){
     var ContractABI = compileContract(contractName);
     var Contract = createContract(ContractABI.abi);
-    deployContract(Contract, ContractABI, account);
+    deployContract(Contract, ContractABI, account, key);
 }
 
 function loadAllAddress(){
@@ -158,13 +172,22 @@ function loadAllAddress(){
     })
 }
 
-async function init(){
-    
-    await web3.setProvider(
-        new Web3.providers.WebsocketProvider(
-            `ws://${host}:${port}`
-            ));
 
+function setWeb3Provider(host, port){
+    return new Promise(async (resolve, reject)=> {
+        try {
+            await web3.setProvider(
+                new Web3.providers.WebsocketProvider(
+                    `ws://${host}:${port}`
+                    ));
+                    resolve();
+        } catch (error) {
+            reject(error);
+        }
+    })
+}
+
+async function init(){
     extendWeb3();
     loadAllAddress();
 }
@@ -183,6 +206,8 @@ module.exports.createContract = createContract;
 module.exports.getAccounts = getAccounts;
 module.exports.getAbis = getAbis;
 module.exports.getABI = getABI;
+module.exports.getTransaction = getTransaction;
+module.exports.setWeb3Provider = setWeb3Provider;
 
 
 module.exports.deployContract = deployContract;

@@ -18,6 +18,7 @@ function createMethod(objMethod){
         }
     })
 }
+
 function callFunc(objFunc){
     return createMethod({
         contractAddress:objFunc.contractAddress,
@@ -35,7 +36,6 @@ function callFunc(objFunc){
         })
     })
 }
-
 function invokeFunc(objFunc){
    return createMethod({
        contractAddress:objFunc.contractAddress,
@@ -46,7 +46,8 @@ function invokeFunc(objFunc){
             try {
                 contractMethod.send({
                     from : objFunc.accountAddress,
-                    gas : 8000000
+                    gas : 8000000,
+                    privateFor : objFunc.privateFor
                 }).then( result => {
                     resolve(result);
                 })
@@ -57,8 +58,6 @@ function invokeFunc(objFunc){
     }
     );
 }
-
-
 
 
 function getContractInstance(contractAddress){

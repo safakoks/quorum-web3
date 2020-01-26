@@ -1,6 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
+const log_file = fs.createWriteStream(path.join(__dirname,"logs","terminal.log"), { flags: 'a' })
+     
+
+function addLogFile(field, message){
+    log_file.write(`---------------\n`);
+    log_file.write(`${field}  :  ${message}\n`);
+}
+
 function createAccountFile(account){
     var data = JSON.stringify(account);
     var accountFilePath = path.join(__dirname, "accounts",`${account.address}.json`);
@@ -61,12 +69,17 @@ async function getFileAbis(callback){
     return await readFiles(path.join(__dirname,"contracts","abi"))
 }
 
+
+
 function readContract(contractName){
     var contractPath = path.resolve(__dirname, 'contracts',"solidity", contractName);
     var source = fs.readFileSync(contractPath, 'utf8');
     return source;
 }
 
+
+
+module.exports.addLogFile = addLogFile;
 module.exports.createAccountFile = createAccountFile;
 module.exports.createAbiFile = createAbiFile;
 module.exports.getFileAccounts = getFileAccounts;

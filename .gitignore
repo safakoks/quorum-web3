@@ -3,3 +3,4 @@ node_modules/*
 contracts/abi
 accounts/
 privateTx.js
+logs/
